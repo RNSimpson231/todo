@@ -20,6 +20,9 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/todos', todosRouter);  // Mount your todo routes
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on http://localhost:${PORT}`);
+// });
+app.listen(5000, '0.0.0.0', () => {
+  console.log('API server running on port 5000');
 });

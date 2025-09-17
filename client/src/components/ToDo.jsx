@@ -1,7 +1,7 @@
 import { useTodosContext } from "../contexts/ToDosContext";
 
 function ToDo({ todo }) {
-  const { toggleFinished, modifyDescription, deleteToDo } = useTodosContext();
+  const { toggleFinished, modifyDescription, removeToDo } = useTodosContext();
 
   return (
     <div>
@@ -16,7 +16,7 @@ function ToDo({ todo }) {
         onChange={(e) => modifyDescription(e.target.value, todo._id)}
         placeholder="Write additional details here."
       ></textarea>
-      <button onClick={() => deleteToDo(todo._id)}>Delete ToDo</button>
+      <button onClick={() => removeToDo(todo._id)}>Delete ToDo</button>
     </div>
   );
 }

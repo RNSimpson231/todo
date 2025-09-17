@@ -1,46 +1,83 @@
 import { useState } from "react";
+import { getTodos, createTodo, deleteTodo, updateTodo } from "../api/todos.js";
+import { useEffect } from "react";
 
 export function useToDos() {
   const [todos, setTodos] = useState([]);
   const [toDoName, setToDoName] = useState("");
 
-  const addToDo = () => {
-    console.log(todos);
-    if (toDoName !== "") {
-      const randomID = Math.floor(Math.random() * 10000);
-      const newTodo = {
-        _id: randomID,
-        name: toDoName,
-        finished: false,
-        description: "",
-      };
+  useEffect(() => {
+    console.log("Fetching todos");
+    const fetchTodos = async () => {
+      try {
+        const todos = await getTodos();
+        setTodos((prev) => todos.data);
+      } catch (err) {
+      } finally {
+      }
+    };
+    fetchTodos();
+  }, []);
 
-      setToDoName("");
+  const addToDo = async () => {
+    try {
+      if (toDoName !== "") {
+        const newTodo = {
+          name: toDoName,
+          finished: false,
+          description: "",
+        };
 
-      setTodos((prev) => {
-        const updated = [...prev, newTodo];
-        return updated;
-      });
-    } else {
-      alert("Please enter a name for your ToDo");
+        const addedTodo = await createTodo(newTodo);
+
+        if (addedTodo) {
+          setToDoName("");
+          setTodos((prev) => {
+            const updated = [...prev, newTodo];
+            return updated;
+          });
+        }
+      } else {
+        alert("Please enter a name for your ToDo");
+      }
+    } catch (err) {
+    } finally {
     }
   };
 
-  const modifyDescription = (description, id) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo._id === id ? { ...todo, description: description } : todo
-      )
-    );
+  const modifyDescription = async (description, id) => {
+    try {
+      const updatedTodo = {
+        ...todos.find((todo) => todo._id === id),
+        description: description,
+      };
+
+      const finalTodo = await updateTodo(id, updatedTodo);
+
+      if (finalTodo) {
+        setTodos((prev) =>
+          prev.map((todo) => (todo._id === id ? updatedTodo : todo))
+        );
+      } else {
+        alert("Please enter a name for your ToDo");
+      }
+    } catch (err) {
+    } finally {
+    }
   };
 
-  const deleteToDo = (id) => {
-    setTodos((prev) => 
-        prev.filter((todo) =>
-            todo._id !== id
-        )
-    )
-  }
+  const removeToDo = async (id) => {
+    try {
+      console.log(id)
+      const deletedTodo = await deleteTodo(id);
+      if (deletedTodo) {
+        setTodos((prev) => prev.filter((todo) => todo._id !== id));
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+    }
+  };
 
   const toggleFinished = (id) => {
     setTodos((prev) =>
@@ -62,6 +99,6 @@ export function useToDos() {
     addToDo,
     toggleFinished,
     modifyDescription,
-    deleteToDo
+    removeToDo,
   };
 }
