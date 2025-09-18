@@ -28,12 +28,14 @@ export function useToDos() {
           description: "",
         };
 
+        console.log("Before");
         const addedTodo = await createTodo(newTodo);
+        console.log("After", addedTodo);
 
         if (addedTodo) {
           setToDoName("");
           setTodos((prev) => {
-            const updated = [...prev, newTodo];
+            const updated = [...prev, addedTodo.data];
             return updated;
           });
         }
@@ -68,28 +70,41 @@ export function useToDos() {
 
   const removeToDo = async (id) => {
     try {
-      console.log(id)
+      console.log(id);
       const deletedTodo = await deleteTodo(id);
       if (deletedTodo) {
         setTodos((prev) => prev.filter((todo) => todo._id !== id));
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     } finally {
     }
   };
 
-  const toggleFinished = (id) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo._id === id
-          ? {
-              ...todo,
-              finished: !todo.finished,
-            }
-          : todo
-      )
-    );
+  const toggleFinished = async (id) => {
+    try {
+      const updatedTodo = {
+        ...todos.find((todo) => todo._id === id),
+        finished: !todos.find((todo) => todo._id === id).finished,
+      };
+
+      const finalTodo = await updateTodo(id, updatedTodo);
+
+      if (finalTodo) {
+        setTodos((prev) =>
+          prev.map((todo) =>
+            todo._id === id
+              ? {
+                  ...todo,
+                  finished: !todo.finished,
+                }
+              : todo
+          )
+        );
+      }
+    } catch (err) {
+    } finally {
+    }
   };
 
   return {
